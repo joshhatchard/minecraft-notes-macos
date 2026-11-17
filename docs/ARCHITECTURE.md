@@ -1,6 +1,6 @@
 # Architecture
 
-Book and Quill Notes is a Swift package with one thin executable and five
+Book and Quill Notes is a Swift package with one thin executable and six
 library modules. Dependencies only point downwards, and modules talk to each
 other through protocols.
 
@@ -21,7 +21,8 @@ BookAndQuillApp  (entry point, dependency wiring)
 | `BookAudio` | `SoundPlaying` protocol, `AudioFileSoundPlayer` (AVFoundation), `SilentSoundPlayer`. | BookAssets |
 | `BookAssets` | `AssetCatalog`: the single entry point to every texture, font and sound. All files live in `Sources/BookAssets/Assets`. | — |
 | `BookUI` | SwiftUI screens, `@Observable` view models, pixel-art theme and components, drag and drop. | all of the above |
-| `BookAndQuillApp` | `@main`, `AppDelegate` (save on quit), `AppComposition` (the one place concrete types are chosen). | BookUI, BookStorage, BookAudio |
+| `BookDebug` | Off-by-default debug facility: window snapshots (`WindowSnapshotter`), scripted scenarios (`Scenario`, `ScenarioRunner`), synthesized clicks and keys (`EventSynthesizer`), expectations. Drives the real UI and view models. See `docs/DEBUGGING.md`. | BookUI, BookCore |
+| `BookAndQuillApp` | `@main`, `AppDelegate` (save on quit), `AppComposition` (the one place concrete types are chosen). | BookUI, BookStorage, BookAudio, BookDebug |
 
 ## Domain rules (BookCore)
 
