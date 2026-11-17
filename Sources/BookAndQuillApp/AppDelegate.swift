@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Needed when launched as a bare executable (`swift run`) rather than an .app bundle.
         NSApp.setActivationPolicy(.regular)
         NSApp.activate()
+        composition.didFinishLaunching()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

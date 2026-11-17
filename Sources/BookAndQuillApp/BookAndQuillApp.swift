@@ -8,7 +8,7 @@ struct BookAndQuillApp: App {
 
     var body: some Scene {
         WindowGroup("Book and Quill") {
-            RootView(app: appDelegate.composition.app)
+            RootView(app: appDelegate.composition.app, targets: appDelegate.composition.debug?.targets)
         }
         .defaultSize(width: 1100, height: 760)
         .onChange(of: scenePhase) { _, phase in

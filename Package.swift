@@ -18,11 +18,15 @@ let package = Package(
         .target(name: "BookAudio", dependencies: ["BookAssets"]),
         // SwiftUI views, view models and the pixel-art theme.
         .target(name: "BookUI", dependencies: ["BookCore", "BookStorage", "BookAudio", "BookAssets"]),
+        // Debug-only tools, inert unless launch arguments ask for them:
+        // window snapshots and scripted UI scenarios (see docs/DEBUGGING.md).
+        .target(name: "BookDebug", dependencies: ["BookUI", "BookCore"]),
         // Thin entry point: dependency wiring only.
-        .executableTarget(name: "BookAndQuillApp", dependencies: ["BookUI", "BookStorage", "BookAudio"]),
+        .executableTarget(name: "BookAndQuillApp", dependencies: ["BookUI", "BookStorage", "BookAudio", "BookDebug"]),
 
         .testTarget(name: "BookCoreTests", dependencies: ["BookCore"]),
         .testTarget(name: "BookStorageTests", dependencies: ["BookStorage", "BookCore"]),
         .testTarget(name: "BookUITests", dependencies: ["BookUI", "BookStorage", "BookCore", "BookAudio", "BookAssets"]),
+        .testTarget(name: "BookDebugTests", dependencies: ["BookDebug"]),
     ]
 )

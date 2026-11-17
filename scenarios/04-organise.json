@@ -1,0 +1,67 @@
+{
+  "name": "organise",
+  "steps": [
+    {"click": "first-chest"}, {"type": "Semester 1"}, {"key": "return"},
+    {"click": "new-chest"}, {"type": "Semester 2"}, {"key": "return"},
+    {"expect": {"chests": ["Semester 1", "Semester 2"]}},
+    {"snapshot": "home-two-chests"},
+
+    {"click": "chest:Semester 1"},
+    {"click": "first-shelf"}, {"type": "Physics"}, {"key": "return"},
+    {"click": "new-shelf"}, {"type": "Chemistry"}, {"key": "return"},
+    {"expect": {"shelves": ["Physics", "Chemistry"]}},
+
+    {"click": "slot:Physics:0"}, {"type": "Week 1"}, {"key": "return"},
+    {"type": "Newton's laws."}, {"click": "done"},
+    {"click": "new-book:Physics"}, {"type": "Week 2"}, {"key": "return"},
+    {"type": "Energy."}, {"click": "done"},
+    {"click": "slot:Chemistry:3"}, {"type": "Lab notes"}, {"key": "return"},
+    {"click": "done"},
+    {"expect": {"books": {"Physics": ["0:Week 1", "1:Week 2"], "Chemistry": ["3:Lab notes"]}}},
+    {"snapshot": "two-shelves-three-books"},
+
+    {"contextMenu": "slot:Physics:0", "item": "Rename…"},
+    {"expect": {"sheet": true}},
+    {"key": "a", "modifiers": ["command"]}, {"type": "Kinematics"},
+    {"snapshot": "rename-book-prompt"},
+    {"key": "return"},
+    {"expect": {"sheet": false, "books": {"Physics": ["0:Kinematics", "1:Week 2"]}}},
+    {"expect": {"file": {"path": "Semester 1/Physics/Kinematics.book/pages/001.md", "contains": "Newton's laws."}}},
+
+    {"dragBook": "Week 2", "toShelf": "Chemistry", "slot": 0},
+    {"expect": {"books": {"Physics": ["0:Kinematics"], "Chemistry": ["0:Week 2", "3:Lab notes"]}}},
+    {"dragBook": "Kinematics", "toShelf": "Chemistry", "slot": 3},
+    {"expect": {"books": {"Physics": ["0:Lab notes"], "Chemistry": ["0:Week 2", "3:Kinematics"]}}},
+    {"snapshot": "after-drags"},
+
+    {"contextMenu": "book:Physics:Lab notes", "item": "Delete…"},
+    {"snapshot": "delete-book-alert"},
+    {"alertButton": "Delete"},
+    {"expect": {"books": {"Physics": []}}},
+
+    {"contextMenu": "shelf:Chemistry", "item": "Rename Shelf…"},
+    {"key": "a", "modifiers": ["command"]}, {"type": "Chem"}, {"key": "return"},
+    {"expect": {"shelves": ["Physics", "Chem"]}},
+    {"dragShelf": "Chem", "toChest": "Semester 2"},
+    {"expect": {"shelves": ["Physics"]}},
+    {"snapshot": "shelf-moved-away"},
+
+    {"click": "back"},
+    {"expect": {"route": "chests"}},
+    {"click": "chest:Semester 2"},
+    {"expect": {"shelves": ["Chem"], "books": {"Chem": ["0:Week 2", "3:Kinematics"]}}},
+    {"click": "book:Chem:Kinematics"},
+    {"expect": {"route": "book", "pageText": "Newton's laws."}},
+    {"click": "done"},
+    {"snapshot": "moved-shelf-in-new-chest"},
+    {"click": "back"},
+
+    {"contextMenu": "chest:Semester 2", "item": "Rename…"},
+    {"key": "a", "modifiers": ["command"]}, {"type": "Semester 2 2027"}, {"key": "return"},
+    {"expect": {"chests": ["Semester 1", "Semester 2 2027"]}},
+    {"contextMenu": "chest:Semester 1", "item": "Delete…"},
+    {"alertButton": "Delete"},
+    {"expect": {"chests": ["Semester 2 2027"]}},
+    {"snapshot": "home-after-delete"}
+  ]
+}

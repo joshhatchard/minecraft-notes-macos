@@ -1,0 +1,30 @@
+{
+  "name": "many-pages",
+  "steps": [
+    {"click": "first-chest"}, {"type": "S1"}, {"key": "return"},
+    {"click": "chest:S1"},
+    {"click": "first-shelf"}, {"type": "History"}, {"key": "return"},
+    {"click": "slot:History:0"}, {"type": "Rome"}, {"key": "return"},
+    {"type": "Page one."},
+    {"click": "page-forward"},
+    {"expect": {"pageLabel": "Page 2 of 2", "typingIntoPage": true}},
+    {"type": "Page two."},
+    {"click": "page-forward"},
+    {"type": "Page three."},
+    {"expect": {"pageLabel": "Page 3 of 3", "pageText": "Page three."}},
+    {"click": "page-backward"},
+    {"click": "page-backward"},
+    {"expect": {"pageLabel": "Page 1 of 3", "pageText": "Page one."}},
+    {"click": "page-forward"},
+    {"click": "page-forward"},
+    {"click": "page-forward"},
+    {"expect": {"pageLabel": "Page 4 of 4", "pageText": ""}},
+    {"type": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"},
+    {"expect": {"pageText": "\n\n\n\n\n\n\n\n\n\n\n\n\n"}},
+    {"type": "Last line"},
+    {"snapshot": "full-page-14-lines"},
+    {"click": "done"},
+    {"expect": {"file": {"path": "S1/History/Rome.book/pages/003.md", "contains": "Page three."}}},
+    {"expect": {"file": {"path": "S1/History/Rome.book/pages/004.md", "contains": "Last line"}}}
+  ]
+}

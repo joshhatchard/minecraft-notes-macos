@@ -8,3 +8,5 @@ DerivedData/
 build.log
 status.txt
 _staged_assets/
+snapshots/
+.task_prompt

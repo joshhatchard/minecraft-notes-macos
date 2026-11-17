@@ -1,0 +1,11 @@
+{
+  "name": "saved-on-quit",
+  "library": "day-one",
+  "steps": [
+    {"expect": {"file": {"path": "Semester 1/Maths/Week 1.book/pages/002.md", "contains": "Squeeze theorem. Then more."}}},
+    {"click": "chest:Semester 1"},
+    {"click": "slot:Maths:0"},
+    {"click": "page-forward"},
+    {"expect": {"pageLabel": "Page 2 of 2", "pageText": "Squeeze theorem. Then more."}}
+  ]
+}

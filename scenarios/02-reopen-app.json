@@ -1,0 +1,16 @@
+{
+  "name": "reopen-app",
+  "library": "day-one",
+  "steps": [
+    {"expect": {"route": "chests", "chests": ["Semester 1"]}},
+    {"snapshot": "home-after-restart"},
+    {"click": "chest:Semester 1"},
+    {"expect": {"shelves": ["Maths"], "books": {"Maths": ["0:Week 1", "1:Week 2"]}}},
+    {"click": "slot:Maths:0"},
+    {"expect": {"route": "book", "pageLabel": "Page 1 of 2", "pageText": "Limits and continuity.\nA limit is the value f(x) approaches as x approaches a.", "typingIntoPage": true}},
+    {"click": "page-forward"},
+    {"expect": {"pageLabel": "Page 2 of 2", "pageText": "Squeeze theorem."}},
+    {"type": " Then more."},
+    {"snapshot": "page-2-after-restart"}
+  ]
+}

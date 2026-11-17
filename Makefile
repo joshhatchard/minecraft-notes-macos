@@ -10,7 +10,7 @@ SWIFT_FLAGS := --scratch-path "$(SCRATCH)"
 BIN_DIR     = $(shell swift build $(SWIFT_FLAGS) -c $(CONFIG) --show-bin-path)
 ASSETS_BUNDLE := $(APP_NAME)_BookAssets.bundle
 
-.PHONY: build test run app lint format art clean
+.PHONY: build test run app snapshot lint format art clean
 
 ## Debug build of every module.
 build:
@@ -33,9 +33,17 @@ app:
 	cp -R "$(BIN_DIR)/$(ASSETS_BUNDLE)" "$(APP_BUNDLE)/Contents/Resources/"
 	cp Packaging/Info.plist "$(APP_BUNDLE)/Contents/Info.plist"
 	iconutil -c icns Packaging/AppIcon.iconset -o "$(APP_BUNDLE)/Contents/Resources/AppIcon.icns"
+	# iCloud Desktop sync can tag files with extended attributes that codesign rejects.
+	xattr -cr "$(APP_BUNDLE)"
 	codesign --force --sign - --timestamp=none "$(APP_BUNDLE)"
 	codesign --verify --strict "$(APP_BUNDLE)"
 	@echo "Built $(APP_BUNDLE)"
+
+## Build the app, play every scenario in scenarios/ on throwaway libraries and
+## write window snapshots to snapshots/ (see docs/DEBUGGING.md).
+## `make snapshot ONLY=first-book` runs matching scenarios only.
+snapshot: app
+	scripts/snapshot.sh $(ONLY)
 
 ## Lint with swift-format (bundled with the Swift toolchain) if available.
 lint:
