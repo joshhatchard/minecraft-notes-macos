@@ -16,8 +16,27 @@ struct PageTextView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSTextView {
+        let textView = Self.makePageTextView(scale: scale)
+        textView.string = model.currentText
+        textView.isEditable = model.isEditable
+        textView.delegate = context.coordinator
+        context.coordinator.lastAccepted = model.currentText
+        if model.isEditable {
+            DispatchQueue.main.async { [weak textView] in
+                guard let textView else { return }
+                textView.window?.makeFirstResponder(textView)
+                textView.setSelectedRange(NSRange(location: (textView.string as NSString).length, length: 0))
+            }
+        }
+        return textView
+    }
+
+    /// A text view with the page's typography and options (no smart
+    /// substitutions, fixed 114 px container). Shared with rendering tests so
+    /// they draw exactly what the editor draws.
+    static func makePageTextView(scale: CGFloat) -> NSTextView {
         let storage = NSTextStorage()
-        let layoutManager = NSLayoutManager()
+        let layoutManager = PageLayoutManager(scale: scale)
         let container = NSTextContainer()
         PageTextLayout.configure(container, scale: scale)
         layoutManager.addTextContainer(container)
@@ -42,18 +61,7 @@ struct PageTextView: NSViewRepresentable {
         textView.insertionPointColor = .black
         textView.typingAttributes = PageTextLayout.attributes(scale: scale)
         textView.selectedTextAttributes = [.backgroundColor: NSColor(white: 0, alpha: 0.2)]
-        textView.string = model.currentText
-        textView.isEditable = model.isEditable
         textView.isSelectable = true
-        textView.delegate = context.coordinator
-        context.coordinator.lastAccepted = model.currentText
-        if model.isEditable {
-            DispatchQueue.main.async { [weak textView] in
-                guard let textView else { return }
-                textView.window?.makeFirstResponder(textView)
-                textView.setSelectedRange(NSRange(location: (textView.string as NSString).length, length: 0))
-            }
-        }
         return textView
     }
 
