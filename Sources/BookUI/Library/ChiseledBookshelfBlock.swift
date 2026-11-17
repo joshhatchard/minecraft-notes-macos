@@ -69,17 +69,14 @@ struct ShelfSlotView: View {
     @State private var isDropTarget = false
 
     var body: some View {
-        content
-            .frame(width: textureRect.width * scale, height: textureRect.height * scale)
-            .overlay {
-                if isDropTarget {
-                    PixelTheme.dropHighlight
-                } else if isHovered {
-                    PixelTheme.hoverHighlight
-                }
+        Group {
+            if let book {
+                bookSlot(book)
+            } else {
+                emptySlot
             }
-            .contentShape(Rectangle())
-            .onHover { hovering in
+        }
+        .onHover { hovering in
                 isHovered = hovering
                 if hovering {
                     hoveredBook = book
@@ -92,33 +89,74 @@ struct ShelfSlotView: View {
             } isTargeted: {
                 isDropTarget = $0
             }
+            .uiTarget(UITargetID.slot(slot, onShelf: shelf.name))
     }
 
-    @ViewBuilder
-    private var content: some View {
-        if let book {
-            PixelTexture(texture: .chiseledBookshelfOccupied, scale: scale, crop: textureRect)
-                .onTapGesture { actions.open(book) }
-                .draggable(DragPayload.book(book.id).encoded) {
-                    PixelTexture(texture: .bookAndQuill, scale: 3)
-                }
-                .contextMenu {
-                    Button("Open") { actions.open(book) }
-                    Button("Rename…") { actions.renameBook(book) }
-                    Divider()
-                    Button("Delete…", role: .destructive) { actions.deleteBook(book) }
-                }
-                .help(book.isSigned ? "\(book.title) by \(book.author)" : book.title)
-                .accessibilityLabel(Text("Book \(book.title)"))
-                .accessibilityAddTraits(.isButton)
-        } else {
-            Color.clear
-                .onTapGesture { actions.createBook(shelf, slot) }
-                .contextMenu {
-                    Button("New Book Here…") { actions.createBook(shelf, slot) }
-                }
-                .help("Empty slot: click to write a new book")
-                .accessibilityLabel(Text("Empty slot"))
+    private func bookSlot(_ book: BookSummary) -> some View {
+        face(PixelTexture(texture: .chiseledBookshelfOccupied, scale: scale, crop: textureRect))
+            .onTapGesture { actions.open(book) }
+            .draggable(DragPayload.book(book.id).encoded) {
+                PixelTexture(texture: .bookAndQuill, scale: 3)
+            }
+            .contextMenu {
+                Button("Open") { actions.open(book) }
+                Button("Rename…") { actions.renameBook(book) }
+                Divider()
+                Button("Delete…", role: .destructive) { actions.deleteBook(book) }
+            }
+            .help(book.isSigned ? "\(book.title) by \(book.author)" : book.title)
+            .accessibilityLabel(Text("Book \(book.title)"))
+            .accessibilityAddTraits(.isButton)
+    }
+
+    private var emptySlot: some View {
+        Button {
+            actions.createBook(shelf, slot)
+        } label: {
+            face(EmptySlotMark(isHovered: isHovered, scale: scale))
         }
+        .buttonStyle(.plain)
+        .contextMenu {
+                Button("New Book Here…") { actions.createBook(shelf, slot) }
+            }
+            .help("Empty slot: click to write a new book here")
+            .accessibilityLabel(Text("Empty slot, write a new book"))
+            .accessibilityAddTraits(.isButton)
+    }
+
+    /// The slot's picture at slot size, with the hover/drop highlight, as one
+    /// clickable rectangle.
+    ///
+    /// The gestures must be attached *after* `contentShape`: an empty slot
+    /// draws nothing opaque, and SwiftUI only hit-tests what is drawn, so
+    /// without it clicks on empty slots were silently ignored. The highlight
+    /// must not take part in hit testing, or it would swallow clicks while
+    /// the pointer hovers.
+    private func face(_ picture: some View) -> some View {
+        picture
+            .frame(width: textureRect.width * scale, height: textureRect.height * scale)
+            .overlay {
+                Group {
+                    if isDropTarget {
+                        PixelTheme.dropHighlight
+                    } else if isHovered {
+                        PixelTheme.hoverHighlight
+                    }
+                }
+                .allowsHitTesting(false)
+            }
+            .contentShape(Rectangle())
+    }
+}
+
+/// A faint quill-and-plus mark in an empty slot, so it reads as "write here"
+/// when hovered.
+private struct EmptySlotMark: View {
+    let isHovered: Bool
+    let scale: CGFloat
+
+    var body: some View {
+        PixelText("+", scale: scale / 2, color: PixelTheme.textHighlighted)
+            .opacity(isHovered ? 1 : 0)
     }
 }

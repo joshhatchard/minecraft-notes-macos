@@ -25,10 +25,11 @@ struct SignBookForm: View {
                     ink: PixelTheme.ink,
                     framed: false
                 )
+                .uiTarget(UITargetID.signTitleField)
             }
             row(top: Geometry.signAuthorTop) {
                 HStack(spacing: 0) {
-                    PixelText("by ", scale: scale, color: Color(white: 0.25), shadow: false)
+                    PixelText("by", scale: scale, color: Color(white: 0.25), shadow: false)
                     PixelTextField(
                         text: $model.signingAuthor,
                         maxLength: BookLimits.maxAuthorLength,
@@ -36,6 +37,7 @@ struct SignBookForm: View {
                         ink: Color(white: 0.25),
                         framed: false
                     )
+                    .uiTarget(UITargetID.signAuthorField)
                 }
             }
             row(top: Geometry.signWarningTop) {

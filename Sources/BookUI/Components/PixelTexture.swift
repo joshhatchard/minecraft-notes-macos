@@ -2,7 +2,7 @@ import BookAssets
 import SwiftUI
 
 /// Draws a texture (or a rectangular crop of it) at an integer scale with
-/// nearest-neighbour sampling.
+/// nearest-neighbour sampling. `scale` must be a whole number.
 struct PixelTexture: View {
     let texture: AssetCatalog.Texture
     let scale: CGFloat
@@ -12,15 +12,9 @@ struct PixelTexture: View {
     var flipped = false
 
     var body: some View {
-        if let loaded = TextureImages.texture(texture) {
-            let region = crop ?? CGRect(origin: .zero, size: loaded.pixelSize)
-            Image(nsImage: loaded.image)
+        if let image = TextureImages.scaled(texture, scale: Int(scale), crop: crop) {
+            Image(nsImage: image)
                 .interpolation(.none)
-                .resizable()
-                .frame(width: loaded.pixelSize.width * scale, height: loaded.pixelSize.height * scale)
-                .offset(x: -region.minX * scale, y: -region.minY * scale)
-                .frame(width: region.width * scale, height: region.height * scale, alignment: .topLeading)
-                .clipped()
                 .scaleEffect(x: flipped ? -1 : 1, y: 1)
                 .accessibilityHidden(true)
         } else {

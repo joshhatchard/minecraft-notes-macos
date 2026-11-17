@@ -32,11 +32,13 @@ struct ChestScreen: View {
         HStack(spacing: 12) {
             PixelButton(title: "< Chests", width: 70) { app.goBack() }
                 .keyboardShortcut(.cancelAction)
+                .uiTarget(UITargetID.backButton)
             PixelTexture(texture: .chest, scale: PixelTheme.guiScale)
             PixelText(model.chestID.name, scale: 3, color: PixelTheme.title)
             Spacer()
             PixelButton(title: "New Shelf", width: 80) { promptNewShelf() }
                 .keyboardShortcut("n", modifiers: .command)
+                .uiTarget(UITargetID.newShelfButton)
         }
         .padding(12)
         .background(Color.black.opacity(0.35))
@@ -47,7 +49,13 @@ struct ChestScreen: View {
         if model.shelves.isEmpty {
             VStack {
                 Spacer()
-                PixelText("This chest is empty. Add a shelf for each subject.", color: PixelTheme.textSecondary)
+                EmptyState(
+                    texture: .bookshelf,
+                    message: "This chest is empty. Add a shelf for each subject.",
+                    actionTitle: "Add Your First Shelf",
+                    targetID: UITargetID.firstShelfButton,
+                    action: promptNewShelf
+                )
                 Spacer()
             }
             .frame(maxWidth: .infinity)

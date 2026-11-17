@@ -20,7 +20,13 @@ struct ChestListScreen: View {
                 PixelText("Your chests", color: PixelTheme.textSecondary)
                 if model.chests.isEmpty {
                     Spacer()
-                    PixelText("No chests yet. Make one for this semester.", color: PixelTheme.textSecondary)
+                    EmptyState(
+                        texture: .chest,
+                        message: "No chests yet. A chest holds one semester.",
+                        actionTitle: "Make Your First Chest",
+                        targetID: UITargetID.firstChestButton,
+                        action: promptNewChest
+                    )
                     Spacer()
                 } else {
                     ScrollView {
@@ -30,6 +36,7 @@ struct ChestListScreen: View {
                                     app.openChest(chest.id)
                                 }
                                 .contextMenu { contextMenu(for: chest) }
+                                .uiTarget(UITargetID.chest(chest.name))
                             }
                         }
                         .padding(24)
@@ -38,6 +45,7 @@ struct ChestListScreen: View {
                 HStack(spacing: 8) {
                     PixelButton(title: "New Chest", width: 98) { promptNewChest() }
                         .keyboardShortcut("n", modifiers: .command)
+                        .uiTarget(UITargetID.newChestButton)
                     SettingsLink {
                         PixelButtonLabel(title: "Settings", width: 98)
                     }

@@ -36,6 +36,7 @@ struct NamePromptSheet: View {
             PixelTextField(text: $name, maxLength: prompt.maxLength, scale: scale)
                 .focused($focused)
                 .onSubmit(confirm)
+                .uiTarget(UITargetID.promptField)
                 .frame(width: 200 * scale)
             if let error {
                 PixelText(error, color: Color(red: 1, green: 0.33, blue: 0.33))
@@ -44,13 +45,16 @@ struct NamePromptSheet: View {
             HStack(spacing: 4 * scale) {
                 PixelButton(title: prompt.confirmTitle, width: 98, action: confirm)
                     .keyboardShortcut(.defaultAction)
+                    .uiTarget(UITargetID.promptConfirm)
                 PixelButton(title: "Cancel", width: 98) { dismiss() }
                     .keyboardShortcut(.cancelAction)
+                    .uiTarget(UITargetID.promptCancel)
             }
         }
         .padding(12 * scale)
         .background(TiledBackground(texture: .darkOakPlanks))
         .onAppear { focused = true }
+        .environment(\.uiTargetInSheet, true)
     }
 
     private func confirm() {

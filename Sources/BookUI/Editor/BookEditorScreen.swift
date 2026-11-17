@@ -74,6 +74,7 @@ struct BookEditorScreen: View {
             PageTextView(model: model, scale: scale)
                 .id(PageIdentity(index: model.pageIndex, scale: scale))
                 .frame(width: PageTextLayout.width * scale, height: PageTextLayout.height * scale)
+                .uiTarget(UITargetID.pageText)
                 .padding(.leading, Geometry.textOrigin.x * scale)
                 .padding(.top, Geometry.textOrigin.y * scale)
         }
@@ -84,6 +85,7 @@ struct BookEditorScreen: View {
             if model.canTurnBack {
                 PageArrowButton(direction: .backward, scale: scale, help: "Previous page") { turn(forward: false) }
                     .keyboardShortcut("[", modifiers: .command)
+                    .uiTarget(UITargetID.pageBackward)
                     .padding(.leading, Geometry.backArrowOrigin.x * scale)
                     .padding(.top, Geometry.backArrowOrigin.y * scale)
             }
@@ -94,6 +96,7 @@ struct BookEditorScreen: View {
                     help: model.forwardAddsPage ? "Add page" : "Next page"
                 ) { turn(forward: true) }
                 .keyboardShortcut("]", modifiers: .command)
+                .uiTarget(UITargetID.pageForward)
                 .padding(.leading, Geometry.forwardArrowOrigin.x * scale)
                 .padding(.top, Geometry.forwardArrowOrigin.y * scale)
             }
@@ -109,12 +112,15 @@ struct BookEditorScreen: View {
             case .pages where model.isEditable:
                 HStack(spacing: (Geometry.secondButtonX - Geometry.halfButtonWidth) * scale) {
                     PixelButton(title: "Sign", width: Geometry.halfButtonWidth, scale: scale) { model.beginSigning() }
+                        .uiTarget(UITargetID.signButton)
                     PixelButton(title: "Done", width: Geometry.halfButtonWidth, scale: scale) { app.goBack() }
                         .keyboardShortcut(.cancelAction)
+                        .uiTarget(UITargetID.doneButton)
                 }
             case .pages:
                 PixelButton(title: "Done", width: Geometry.fullButtonWidth, scale: scale) { app.goBack() }
                     .keyboardShortcut(.cancelAction)
+                    .uiTarget(UITargetID.doneButton)
             case .signing:
                 HStack(spacing: (Geometry.secondButtonX - Geometry.halfButtonWidth) * scale) {
                     PixelButton(
@@ -127,8 +133,10 @@ struct BookEditorScreen: View {
                             app.goBack()
                         }
                     }
+                    .uiTarget(UITargetID.signConfirm)
                     PixelButton(title: "Cancel", width: Geometry.halfButtonWidth, scale: scale) { model.cancelSigning() }
                         .keyboardShortcut(.cancelAction)
+                        .uiTarget(UITargetID.signCancel)
                 }
             }
         }

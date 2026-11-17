@@ -3,9 +3,13 @@ import SwiftUI
 /// Shows the screen for the current route.
 public struct RootView: View {
     private let app: AppModel
+    private let targets: UITargetRegistry?
 
-    public init(app: AppModel) {
+    /// - Parameter targets: Records where clickable views are, for the debug
+    ///   scenario runner. Leave `nil` in the normal app.
+    public init(app: AppModel, targets: UITargetRegistry? = nil) {
         self.app = app
+        self.targets = targets
         FontRegistry.registerBundledFonts()
     }
 
@@ -25,6 +29,7 @@ public struct RootView: View {
             }
         }
         .environment(\.playSound, SoundAction { [app] effect in app.play(effect) })
+        .environment(\.uiTargetRegistry, targets)
         .frame(minWidth: 820, minHeight: 600)
     }
 }
