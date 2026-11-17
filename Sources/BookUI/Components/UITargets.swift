@@ -61,6 +61,7 @@ public enum UITargetID {
     public static let signCancel = "sign-cancel"
     public static let signTitleField = "sign-title"
     public static let signAuthorField = "sign-author"
+    public static let signedBadge = "signed-badge"
 
     public static func chest(_ name: String) -> String { "chest:\(name)" }
     public static func shelf(_ name: String) -> String { "shelf:\(name)" }

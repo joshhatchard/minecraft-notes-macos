@@ -36,6 +36,10 @@ struct BookEditorScreen: View {
                 model.book.isSigned ? "by \(model.book.author)" : "Book and Quill",
                 color: PixelTheme.textSecondary
             )
+            if model.book.isSigned {
+                PixelText("Signed - read only", color: PixelTheme.textSecondary)
+                    .uiTarget(UITargetID.signedBadge)
+            }
             Spacer()
         }
     }

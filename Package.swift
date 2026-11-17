@@ -27,6 +27,6 @@ let package = Package(
         .testTarget(name: "BookCoreTests", dependencies: ["BookCore"]),
         .testTarget(name: "BookStorageTests", dependencies: ["BookStorage", "BookCore"]),
         .testTarget(name: "BookUITests", dependencies: ["BookUI", "BookStorage", "BookCore", "BookAudio", "BookAssets"]),
-        .testTarget(name: "BookDebugTests", dependencies: ["BookDebug"]),
+        .testTarget(name: "BookDebugTests", dependencies: ["BookDebug", "BookUI", "BookStorage", "BookAudio", "BookCore"]),
     ]
 )

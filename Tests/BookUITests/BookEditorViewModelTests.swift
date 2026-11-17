@@ -151,3 +151,54 @@ struct BookEditorViewModelTests {
         #expect(editor.errorMessage != nil)
     }
 }
+
+@MainActor
+@Suite("Signed book is read-only")
+struct SignedBookViewModelTests {
+    private func signedEditor(pages: Int = 1) throws -> BookEditorViewModel {
+        let editor = try Fixture().makeEditor()
+        _ = editor.applyEdit(replacing: NSRange(location: 0, length: 0), with: "Draft")
+        for _ in 1..<pages { editor.turnForward() }
+        editor.beginSigning()
+        editor.signingTitle = "Final"
+        editor.signingAuthor = "Josh"
+        #expect(editor.confirmSigning())
+        return editor
+    }
+
+    @Test func unsignedBookAcceptsEdits() throws {
+        let editor = try Fixture().makeEditor()
+        #expect(editor.isEditable)
+        #expect(editor.applyEdit(replacing: NSRange(location: 0, length: 0), with: "Hi") == "Hi")
+    }
+
+    @Test func signedBookRejectsEveryEditPath() throws {
+        let editor = try signedEditor()
+        #expect(editor.applyEdit(replacing: NSRange(location: 0, length: 0), with: "x") == nil)
+        #expect(editor.applyEdit(replacing: NSRange(location: 0, length: 5), with: "") == nil)
+        #expect(!editor.setCurrentText("Overwritten"))
+        #expect(!editor.setCurrentTextIfChanged("Overwritten"))
+        #expect(editor.currentText == "Draft")
+        editor.beginSigning()
+        #expect(editor.mode == .pages)
+    }
+
+    @Test func signedBookCannotGrowButCanBeRead() throws {
+        let editor = try signedEditor(pages: 2)
+        #expect(editor.pageCount == 2)
+        #expect(editor.pageIndex == 1)
+        editor.turnBack()
+        #expect(editor.pageIndex == 0)
+        editor.turnForward()
+        #expect(editor.pageIndex == 1)
+        #expect(!editor.canTurnForward)
+        editor.turnForward()
+        #expect(editor.pageCount == 2)
+    }
+
+    @Test func signedBookKeepsItsTitleAndAuthor() throws {
+        let editor = try signedEditor()
+        #expect(editor.book.title == "Final")
+        #expect(editor.book.author == "Josh")
+    }
+}
