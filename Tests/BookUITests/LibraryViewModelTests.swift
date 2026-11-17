@@ -134,6 +134,21 @@ struct LibraryViewModelTests {
         #expect(try fixture.repository.shelves(in: other).map(\.name) == ["Physics"])
     }
 
+    @Test func aFailedDropReportsAnErrorAndKeepsTheBook() throws {
+        let fixture = try Fixture()
+        let model = ChestViewModel(chestID: fixture.chest, repository: fixture.repository, sound: fixture.sound)
+        model.reload()
+        let ghost = ShelfID(chest: fixture.chest, name: "Ghost")
+        #expect(!model.handleDrop([DragPayload.book(fixture.book).encoded], onSlot: 1, of: ghost))
+        #expect(model.errorMessage != nil)
+        #expect(model.shelves.first { $0.id == fixture.shelf }?.books.map(\.id) == [fixture.book])
+        #expect(fixture.sound.played.isEmpty)
+
+        let missingChest = ChestID(name: "Ghost")
+        #expect(!model.handleDrop([DragPayload.shelf(fixture.shelf).encoded], onChest: missingChest))
+        #expect(model.shelves.map(\.id) == [fixture.shelf])
+    }
+
     @Test func wrongOrForeignPayloadsAreIgnored() throws {
         let fixture = try Fixture()
         let model = ChestViewModel(chestID: fixture.chest, repository: fixture.repository, sound: fixture.sound)
