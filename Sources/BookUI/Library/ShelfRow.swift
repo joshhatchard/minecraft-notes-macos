@@ -77,7 +77,7 @@ struct ShelfRow: View {
             PixelTexture(texture: .bookshelf, scale: PixelTheme.guiScale)
             PixelText(shelf.name, color: PixelTheme.title)
         }
-        .padding(6)
+        .padding(.vertical, 6)
         .contentShape(Rectangle())
         .draggable(DragPayload.shelf(shelf.id).encoded) {
             HStack(spacing: 6) {

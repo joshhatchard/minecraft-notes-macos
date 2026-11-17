@@ -19,7 +19,7 @@ struct ChestSidebar: View {
                     }
                 }
             }
-            PixelText("Drag a shelf's name onto a chest to move it there.", scale: 1, color: PixelTheme.textSecondary)
+            PixelText("Drag a shelf's name onto a chest to move it there.", color: PixelTheme.textSecondary)
         }
         .padding(12)
         .frame(width: 190, alignment: .topLeading)
