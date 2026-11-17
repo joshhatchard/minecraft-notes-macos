@@ -14,6 +14,10 @@ public final class ScenarioRunner {
     /// Pause after each step so SwiftUI updates and short animations finish.
     static let settleTime: Duration = .milliseconds(450)
 
+    /// How long an `expect` step keeps retrying before it fails.
+    static let expectationTimeout: Duration = .seconds(3)
+    static let expectationPollInterval: Duration = .milliseconds(100)
+
     private let app: AppModel
     private let targets: UITargetRegistry
     private let libraryRoot: URL
@@ -88,9 +92,22 @@ public final class ScenarioRunner {
         case .snapshot(let name):
             snapshot(name, in: window)
         case .expect(let expectation):
-            let problems = ExpectationChecker(app: app, window: window, libraryRoot: libraryRoot).problems(with: expectation)
-            if !problems.isEmpty { throw ScenarioFailure(problems.joined(separator: "; ")) }
+            try await check(expectation, in: window)
         }
+    }
+
+    /// Checks an expectation, polling until it holds. Focus, autosave and
+    /// animations finish on their own schedule, so a fixed pause is not enough;
+    /// only the last attempt's problems are reported.
+    private func check(_ expectation: ScenarioExpectation, in window: NSWindow) async throws {
+        let checker = ExpectationChecker(app: app, window: window, libraryRoot: libraryRoot)
+        let deadline = ContinuousClock.now + Self.expectationTimeout
+        var problems = checker.problems(with: expectation)
+        while !problems.isEmpty, ContinuousClock.now < deadline {
+            try? await Task.sleep(for: Self.expectationPollInterval)
+            problems = checker.problems(with: expectation)
+        }
+        if !problems.isEmpty { throw ScenarioFailure(problems.joined(separator: "; ")) }
     }
 
     private func locate(_ id: String, in window: NSWindow) throws -> (UITargetRegistry.Target, NSWindow) {

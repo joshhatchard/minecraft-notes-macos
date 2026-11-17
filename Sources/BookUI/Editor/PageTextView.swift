@@ -21,20 +21,14 @@ struct PageTextView: NSViewRepresentable {
         textView.isEditable = model.isEditable
         textView.delegate = context.coordinator
         context.coordinator.lastAccepted = model.currentText
-        if model.isEditable {
-            DispatchQueue.main.async { [weak textView] in
-                guard let textView else { return }
-                textView.window?.makeFirstResponder(textView)
-                textView.setSelectedRange(NSRange(location: (textView.string as NSString).length, length: 0))
-            }
-        }
+        textView.takesFocusWhenShown = model.isEditable
         return textView
     }
 
     /// A text view with the page's typography and options (no smart
     /// substitutions, fixed 114 px container). Shared with rendering tests so
     /// they draw exactly what the editor draws.
-    static func makePageTextView(scale: CGFloat) -> NSTextView {
+    static func makePageTextView(scale: CGFloat) -> PageNSTextView {
         let storage = NSTextStorage()
         let layoutManager = PageLayoutManager(scale: scale)
         let container = NSTextContainer()
@@ -42,7 +36,7 @@ struct PageTextView: NSViewRepresentable {
         layoutManager.addTextContainer(container)
         storage.addLayoutManager(layoutManager)
 
-        let textView = NSTextView(frame: .zero, textContainer: container)
+        let textView = PageNSTextView(frame: .zero, textContainer: container)
         textView.drawsBackground = false
         textView.isRichText = false
         textView.importsGraphics = false
@@ -140,5 +134,29 @@ extension BookEditorViewModel {
     @discardableResult
     func setCurrentTextIfChanged(_ text: String) -> Bool {
         text == currentText || setCurrentText(text)
+    }
+}
+
+/// The page's text view. It takes keyboard focus, caret at the end, as soon as
+/// it is in a window, so a book opens ready to type.
+///
+/// Focus is requested from `viewDidMoveToWindow` rather than from the
+/// representable's `makeNSView`, because the view has no window yet there, and
+/// retried on the next run-loop turn because a closing sheet (the new-book
+/// title prompt) hands focus back to the window as it goes away.
+final class PageNSTextView: NSTextView {
+    var takesFocusWhenShown = false
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard takesFocusWhenShown, window != nil else { return }
+        takeFocus()
+        DispatchQueue.main.async { [weak self] in self?.takeFocus() }
+    }
+
+    private func takeFocus() {
+        guard let window, window.firstResponder !== self else { return }
+        window.makeFirstResponder(self)
+        setSelectedRange(NSRange(location: (string as NSString).length, length: 0))
     }
 }
