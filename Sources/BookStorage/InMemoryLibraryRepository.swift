@@ -175,7 +175,8 @@ public final class InMemoryLibraryRepository: LibraryRepository {
                 var occupant = chests[targetChest].shelves[targetShelf].books.remove(at: occupantIndex)
                 occupant.slot = sourceSlot
                 if !sameShelf {
-                    occupant.folder = FileNaming.unique(occupant.folder, among: chests[sourceChest].shelves[sourceShelf].books.map(\.folder))
+                    occupant.folder = FileNaming.unique(
+                        occupant.folder, among: chests[sourceChest].shelves[sourceShelf].books.map(\.folder))
                 }
                 chests[sourceChest].shelves[sourceShelf].books.append(occupant)
                 displacedID = BookID(shelf: book.shelf, folderName: occupant.folder)

@@ -8,7 +8,8 @@ extension FileSystemLibraryRepository {
         let validTitle = try FileNaming.validTitle(title)
         if let slot, slot < 0 { throw .invalidSlot(slot) }
         let occupied = Set(try books(on: shelf).map(\.slot))
-        let targetSlot = slot.flatMap { occupied.contains($0) ? nil : $0 }
+        let targetSlot =
+            slot.flatMap { occupied.contains($0) ? nil : $0 }
             ?? ShelfLayout.firstFreeSlot(occupied: occupied)
 
         let folder = try uniqueBookFolder(FileNaming.sanitize(validTitle), in: shelfURL)

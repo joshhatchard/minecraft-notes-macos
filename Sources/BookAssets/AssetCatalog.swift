@@ -63,7 +63,8 @@ public enum AssetCatalog {
 
     private static func resource(_ name: String, extension fileExtension: String, folder: String) -> URL? {
         guard let base = resourceBundle.resourceURL else { return nil }
-        let url = base
+        let url =
+            base
             .appending(path: "Assets", directoryHint: .isDirectory)
             .appending(path: folder, directoryHint: .isDirectory)
             .appending(path: "\(name).\(fileExtension)", directoryHint: .notDirectory)
@@ -76,7 +77,8 @@ public enum AssetCatalog {
     private static let resourceBundle: Bundle = {
         let bundleName = "BookAndQuill_BookAssets.bundle"
         if let packaged = Bundle.main.resourceURL?.appending(path: bundleName),
-           let bundle = Bundle(url: packaged) {
+            let bundle = Bundle(url: packaged)
+        {
             return bundle
         }
         return Bundle.module

@@ -13,11 +13,12 @@ enum FileNaming {
     /// Replaces forbidden and control characters with `-`, trims spaces and
     /// leading/trailing dots, and caps the length.
     static func sanitize(_ name: String) -> String {
-        var result = String(name.map { character -> Character in
-            if forbidden.contains(character) { return "-" }
-            if character.unicodeScalars.contains(where: { $0.properties.generalCategory == .control }) { return "-" }
-            return character
-        })
+        var result = String(
+            name.map { character -> Character in
+                if forbidden.contains(character) { return "-" }
+                if character.unicodeScalars.contains(where: { $0.properties.generalCategory == .control }) { return "-" }
+                return character
+            })
         result = result.trimmingCharacters(in: .whitespacesAndNewlines)
         while result.hasPrefix(".") { result.removeFirst() }
         result = String(result.prefix(maxLength))

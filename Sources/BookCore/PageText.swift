@@ -3,7 +3,8 @@ public enum PageText {
     /// Returns `text` with line endings normalised to `\n`, tabs turned into a
     /// space and every other control character removed. Pages are plain text.
     public static func sanitize(_ text: String) -> String {
-        let unified = text
+        let unified =
+            text
             .replacingOccurrences(of: "\r\n", with: "\n")
             .replacingOccurrences(of: "\r", with: "\n")
             .replacingOccurrences(of: "\t", with: " ")
